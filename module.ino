@@ -12,15 +12,17 @@ byte digitBuffer[8];
 String display_number = "0";
 
 // Timer1
+// time period to http requests
 uint32_t myTimer1;
 int period = 60000;
 // Timer 2
+// update display data
 uint32_t myTimer2;
 int period2 = 1000;
 
 // Allocate the JSON document
-// Wi-Fi & WEB
-const char* ssid     = "";     
+// Wi-Fi & WEB setup
+const char* ssid     = "";
 const char* password = "";
 const char* server_rq = "";
 const char* server_auth = "";
@@ -85,7 +87,6 @@ void displayjson(){
   const char* resultType = doc["data"]["resultType"];
   String datavalue = doc["data"]["result"][0]["value"][1];
   // Print values.
-  Serial.println("-------------------------------------");
   Serial.print("Message received: ");
   Serial.println(msg_status);
   Serial.print("Resault type: ");
@@ -130,8 +131,8 @@ void shownumber(){
 }
 
 void showDisplay(){
-  
-  const byte digit[10] = {  // маска для 7 сигментного индикатора  
+// 7seg display mask
+  const byte digit[10] = {
       0b11000000, // 0
       0b11111001, // 1
       0b10100100, // 2
@@ -143,8 +144,8 @@ void showDisplay(){
       0b10000000, // 8
       0b10010000, // 9 
   };
-
-  const byte chr[8] = { // маска для разряда
+// mask for numbers
+  const byte chr[8] = {
       0b00010000, // 0 digit ( 0 buffer )
       0b00100000, // 1
       0b01000000, // 2
@@ -154,14 +155,14 @@ void showDisplay(){
       0b00000100, // 6
       0b00001000  // 7 
   };
-  // отправляем в цикле по два байта в сдвиговые регистры
+// send data to HC595
   for(byte i = 0; i <= display_number.length()-1; i++){ 
-    digitalWrite(RCLK, LOW); // открываем защелку
-      if ( digitBuffer[i] != -1) { // пустой разряд ХЗ использовать или нет
-      shiftOut(DIO, SCLK, MSBFIRST, digit[digitBuffer[i]]);  // отправляем байт с "числом"
-      shiftOut(DIO, SCLK, MSBFIRST, chr[i]);   // включаем разряд
+    digitalWrite(RCLK, LOW);
+      if ( digitBuffer[i] != -1) {
+      shiftOut(DIO, SCLK, MSBFIRST, digit[digitBuffer[i]]);
+      shiftOut(DIO, SCLK, MSBFIRST, chr[i]);
       }
-    digitalWrite(RCLK, HIGH); // защелкиваем регистры
+    digitalWrite(RCLK, HIGH);
   }
 }
 
